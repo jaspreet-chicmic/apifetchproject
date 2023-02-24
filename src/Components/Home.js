@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 const API_URL_COUNTRIES = "https://countriesnow.space/api/v0.1/countries/capital";
 
 function Home() {
-    const [allItems, setAllItems] = useState([]);//let state know its type i.e array 
+    const [allItems, setAllItems] = useState(()=>[]);//let state know its type i.e array 
 
     //on mount
     useEffect(()=>{
@@ -14,7 +14,7 @@ function Home() {
             alert("error occured 404");
         })
         .then(data=>{
-            let countries = (data.data).map((country,index,arr)=>{
+            let countries = (data.data)?.map((country,index,arr)=>{
                 return country.name;
             });
             setAllItems([...countries]);//[] must be provided
@@ -34,15 +34,14 @@ function Home() {
                     return <option key = {index} value={oneItem}>{oneItem}</option>
                 })}
             </select>
-            <h3>{(selectedItem != "")?`Selected Country: ${selectedItem}`:"Please select a country."}</h3>
+            <h3>{(selectedItem !== "")?`Selected Country: ${selectedItem}`:"Please select a country."}</h3>
+            
             <Link to={"/Cities/"+ selectedItem}><button onClick={()=>{
                 // (selectedItem && setClickedItem(selectedItem))
-                if(selectedItem = "")
+                if(selectedItem === "")
                  alert("Select a country");
                 else
-                {
                     setClickedItem(selectedItem)
-                }
                 }}>Cities</button></Link>
         </div>
   )

@@ -1,12 +1,17 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function Error() {
-  
+  const navigate = useNavigate();
+  setTimeout(() => {
+    navigate("/");
+  },2000)
+
   return (
-    // {setTimeout(()=>{
-    //   return 
-    // },2000)}
-    <div>Error has occured </div>
+    <div>
+      Error has occured 
+      <h5>Please Select a valid country</h5>
+    </div>
   )
 }
 

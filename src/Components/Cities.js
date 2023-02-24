@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 const POST_API_URL = "https://countriesnow.space/api/v0.1/countries/cities";
 
 function Cities() {
   const {selectedItem} = useParams();
-  const [cities,setCities] = useState(()=>[]);
+  const [cities,setCities] = useState(()=>[]);//fixed array 
+  const [filteredCities, setFilteredCities] = useState(()=>[])
   const [searchedTerm,setSearchedTerm] = useState(()=>"");
   const [error,setError] = useState(()=>"");
-  const [filteredArrayCities,setFilteredArrayCities] = useState(()=>[]);
-
+  const [loading,setLoading] = useState(()=>true);
+  //useref
+  const debouncedCities = useRef("");
+  //onmount
   useEffect(()=>{
     fetch(POST_API_URL,{
         method:'POST',
@@ -28,37 +31,109 @@ function Cities() {
       {
         let citiesArray = [];
         citiesArray = ([...data.data])?.map((city,idx) => city);
-        let filteredArray = [];
-        filteredArray = citiesArray?.filter(city => {
-          // let slicedTerm = (city.slice(0,searchedTerm.length));
-          let lower = city.toLowerCase();
-          let lowerSearch = searchedTerm.toLowerCase();
-          return (lower.includes(lowerSearch));
-        });
-        setCities(filteredArray);
+        setCities(citiesArray);
+        setFilteredCities(citiesArray);
+        setLoading(false);
       })
     .catch(error=>{
       console.log(error.message);
       setError(error.message);
-  });
+  })
+  return ()=>{
+    setLoading(true);
+  }
+  },[])
 
-},[searchedTerm])
+  useEffect(()=>{
+    let id = setTimeout(()=>{
+        let filteredArray = [], citiesArray = cities;
+        filteredArray = citiesArray?.filter(city => {
+        // let slicedTerm = (city.slice(0,searchedTerm.length));
+        let lower = city.toLowerCase();
+        let lowerSearch = searchedTerm.toLowerCase();
+        return (lower.includes(lowerSearch));
+      });
+      console.log(filteredArray.at(-1));
+      setFilteredCities(filteredArray);
+    },500);
+    
+    return () => clearTimeout(id);
+    console.log(cities);
+    // setLoading(false);
+  },[searchedTerm])
 
   return (
     <div>
     <Link to="/"><button>Countries</button></Link>
-    <input value={searchedTerm} onChange={((e)=> setSearchedTerm(e.target.value))}></input>
-    <h3>Cities of {searchedTerm}</h3>
+    <input value={searchedTerm} onChange={((e)=>{setSearchedTerm(e.target.value)} )}></input>
+    <h3>Cities of {selectedItem}</h3>
     {(error) && <div>{error}</div>}
+    {(loading) && <div>loading...</div> && (!error)}
+
+    {/* {()} */}
     {/* in js || and && work different */}
     {/* {error || null} */}
-      <ul>
-        {cities?.map((city,idx)=> {
+
+      {(!loading) && <ul>
+        {filteredCities?.map((city,idx)=> {
           return <li key={idx}>{city}</li>
         })}
-      </ul>
+      </ul>}
     </div>
   )
 }
 
 export default Cities
+
+// let filteredArray = [];
+//       filteredArray = citiesArray?.filter(city => {
+//         // let slicedTerm = (city.slice(0,searchedTerm.length));
+//         let lower = city.toLowerCase();
+//         let lowerSearch = searchedTerm.toLowerCase();
+//         return (lower.includes(lowerSearch));
+//       });
+
+// useEffect(()=>{
+//   let id = setTimeout(() => fetch(POST_API_URL,{
+//       method:'POST',
+//       headers:{
+//           'Content-Type':'application/json'
+//       },
+//       body:JSON.stringify({
+//           "country": selectedItem
+//       })
+//   })
+//   .then(res=>{
+//     if(res.ok)
+//       return res.json()
+//     throw Error("Unable to fetch");
+//   })
+//   .then(data=>
+//     {
+//       let citiesArray = [];
+//       citiesArray = ([...data.data])?.map((city,idx) => city);
+      // let filteredArray = [];
+      // filteredArray = citiesArray?.filter(city => {
+      //   // let slicedTerm = (city.slice(0,searchedTerm.length));
+      //   let lower = city.toLowerCase();
+      //   let lowerSearch = searchedTerm.toLowerCase();
+      //   return (lower.includes(lowerSearch));
+      // });
+      // setCities(filteredArray);
+      // setLoading(false);
+//     })
+//   .catch(error=>{
+//     console.log(error.message);
+//     setError(error.message);
+// }),1000);
+// return ()=>{
+  // setLoading(true);
+//   clearTimeout(id);
+// };
+
+// },[searchedTerm])
+
+
+
+
+// Navigate
