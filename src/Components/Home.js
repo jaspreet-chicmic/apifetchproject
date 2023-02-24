@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 const API_URL_COUNTRIES = "https://countriesnow.space/api/v0.1/countries/capital";
 
 function Home() {
     const [allItems, setAllItems] = useState(()=>[]);//let state know its type i.e array 
-
+    const navigate = useNavigate();
     //on mount
     useEffect(()=>{
         fetch(API_URL_COUNTRIES)
@@ -22,7 +22,7 @@ function Home() {
     },[])
 
     const [selectedItem, setSelectedItem] = useState("");
-    const [clickedItem,setClickedItem] = useState("");
+
     
     return (
         <div>
@@ -36,13 +36,15 @@ function Home() {
             </select>
             <h3>{(selectedItem !== "")?`Selected Country: ${selectedItem}`:"Please select a country."}</h3>
             
-            <Link to={"/Cities/"+ selectedItem}><button onClick={()=>{
+            {/* <Link to={"/Cities/"+ selectedItem}> */}
+            <button onClick={()=>{
                 // (selectedItem && setClickedItem(selectedItem))
                 if(selectedItem === "")
-                 alert("Select a country");
+                    alert("Select a country");
                 else
-                    setClickedItem(selectedItem)
-                }}>Cities</button></Link>
+                    navigate("/Cities/"+selectedItem);
+                }}>Cities</button>
+                {/* </Link> */}
         </div>
   )
 }

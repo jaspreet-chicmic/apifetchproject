@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 const POST_API_URL = "https://countriesnow.space/api/v0.1/countries/cities";
 
 function Cities() {
@@ -10,7 +10,6 @@ function Cities() {
   const [error,setError] = useState(()=>"");
   const [loading,setLoading] = useState(()=>true);
   //useref
-  const debouncedCities = useRef("");
   //onmount
   useEffect(()=>{
     fetch(POST_API_URL,{
@@ -53,12 +52,15 @@ function Cities() {
         let lowerSearch = searchedTerm.toLowerCase();
         return (lower.includes(lowerSearch));
       });
-      console.log(filteredArray.at(-1));
+      setLoading(false);
+      // console.log(filteredArray.at(-1));
       setFilteredCities(filteredArray);
     },500);
     
-    return () => clearTimeout(id);
-    console.log(cities);
+    return () => {
+      setLoading(true);
+      clearTimeout(id)
+    };
     // setLoading(false);
   },[searchedTerm])
 
@@ -68,7 +70,7 @@ function Cities() {
     <input value={searchedTerm} onChange={((e)=>{setSearchedTerm(e.target.value)} )}></input>
     <h3>Cities of {selectedItem}</h3>
     {(error) && <div>{error}</div>}
-    {(loading) && <div>loading...</div> && (!error)}
+    {(loading) && <div>loading...</div>}
 
     {/* {()} */}
     {/* in js || and && work different */}
